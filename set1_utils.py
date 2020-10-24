@@ -3,7 +3,7 @@ def repeating_xor(plaintext, key):
     cipher = bytearray(len(plaintext))
     for i in range(0, len(plaintext)):
         cipher[i] = plaintext[i] ^ key[i % len(key)]
-    return cipher.hex()
+    return cipher
 
 
 def score_plaintext(plaintext):
