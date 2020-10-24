@@ -65,7 +65,7 @@ def challenge4():
 def challenge5():
     a = b"Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
     key = b"ICE"
-    ans = repeating_xor(a, key).hex()
+    ans = xor_util(a, key).hex()
     challenge_complete(5, ans, "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f")
 
 def challenge6():
@@ -118,7 +118,7 @@ def challenge6():
             tmp = bytearray()
             tmp.append(x)
 
-            score = score_plaintext(repeating_xor(block, tmp))
+            score = score_plaintext(xor_util(block, tmp))
             if score > top_score:
                 key = x
                 top_score = score
