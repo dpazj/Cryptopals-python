@@ -37,6 +37,18 @@ def pkcs7pad(to_pad, block_length):
     
     return to_pad
 
+def validpkcs7(to_unpad):
+    last_byte = to_unpad[-1:]
+    last_byte_int = int.from_bytes(last_byte, "big")
+    return to_unpad[-last_byte_int: ] == last_byte * last_byte_int
+
+
+def pkcs7unpad(to_unpad):
+    if not validpkcs7(to_unpad):
+        assert("invalid pkcs7 padding")
+    last_byte = int.from_bytes(to_unpad[-1:],"big")
+    return to_unpad[:-last_byte]
+
 
 def xor_util(plaintext, key):
     cipher = bytearray(len(plaintext))
