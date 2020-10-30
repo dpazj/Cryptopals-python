@@ -45,7 +45,7 @@ def validpkcs7(to_unpad):
 
 def pkcs7unpad(to_unpad):
     if not validpkcs7(to_unpad):
-        assert("invalid pkcs7 padding")
+        raise Exception("invalid pkcs7 padding")
     last_byte = int.from_bytes(to_unpad[-1:],"big")
     return to_unpad[:-last_byte]
 
