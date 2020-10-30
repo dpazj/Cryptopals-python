@@ -32,6 +32,26 @@ def chal12_oracle(to_encrypt):
 
     return ciphertext
 
+def profile_for(email):
+    email = email.replace('&', '').replace('=', '')
+    return "email={}&uid=10&role=user".format(email)
+
+
+def parse_profile(to_parse):
+    pairs = to_parse.split("&")
+    s = {}
+    for pair in pairs:
+        name = pair.split("=")[0]
+        val = pair.split("=")[1]
+        s[name] = val
+    return s
+
+
+def chal13_oracle(email, key):
+    profile = profile_for(email)
+    return aes_ecb_encrypt(key, pkcs7pad(bytes(profile, 'utf-8'), 16))
+
+
 
 def challenge9():
     a = b"YELLOW SUBMARINE"  
@@ -106,13 +126,40 @@ def challenge12():
                     secret += bytes([i])
                     break
     challenge_complete(12, pkcs7unpad(secret), CHAL12_SECRET)
-            
-        
-        
+                
+def challenge13(): 
+    key = random_aes_key() #this is unknown
 
-       
+    admin = pkcs7pad(bytes("admin", 'utf-8'), 16).decode("utf-8")
+
+    #find admin block 
+    admin_block = b''
+    for x in range(0,16):
+        payload = ("A" * x ) + admin + admin                
+        ciphertext = chal13_oracle("foo" + payload + "@gmail.com", key)
+        blocks = [ciphertext[i : i + 16] for i in range(0, len(ciphertext), 16)]
+        
+        for i in range(0,len(blocks)):
+            for j in range(0, len(blocks)):
+                if i == j:
+                    continue
+                if blocks[i] == blocks[j]:
+                    admin_block = blocks[i]
+                    break
+        if admin_block != b'':
+            break
+
+    ciphertext = chal13_oracle("foo@gmail.com", key)
+    ciphertext = ciphertext[0:-16]
+    ciphertext += admin_block
+    
+    plaintext = aes_ecb_decrypt(key, ciphertext)
+    x = parse_profile(pkcs7unpad(plaintext).decode("utf-8"))
+    challenge_complete(13, x, parse_profile("email=foo@gmail.com&uid=10&role=admin"))
+    
 
 #challenge9()
 #challenge10()
 #challenge11()
-challenge12()
+#challenge12()
+challenge13()
